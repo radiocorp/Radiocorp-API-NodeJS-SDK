@@ -1,0 +1,1131 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: beheer@radiocorp.nl
+    name: RadioCorp BV
+    url: https://www.radiocorp.nl/
+  description: |-
+    Public/Private API for accessing RadioCorp recources through custom applications.\
+    At the moment only available for the stations 100% NL, SLAM! and SLAM!TV
+    ### Available formats ###
+    Available formats (based on the 'Accept' header):\
+    json, array, csv, html, jsonp, php, serialized, xml\
+    The API defaults to application/json when no header supplied.
+    ### Contact / License ###
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Public RadioCorp API [Development]
+  version: v0.0
+servers:
+- description: Production server
+  url: https://api.dev.radiocorp.io
+tags:
+- description: Group of endpoints to get EPG information for the station.
+  name: EPG
+- description: Programs or presenters or a combination of the above.
+  name: Station
+- description: Group of endpoints for on-demand replay of hours and in the future short items.
+  name: Replay
+- description: Group of endpoints to get information about songs.
+  name: Song
+- description: Group of endpoints to get information about News.
+  name: News
+- description: Group of endpoints which are used by RadioManager.
+  name: RadioManager
+paths:
+  /Epg/CurrentShow:
+    get:
+      operationId: Epg::currentShow_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpgShow'
+          description: Returns the current show on-air as object
+        424:
+          description: Returned when the EPG module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the current on-air show.
+      tags:
+      - EPG
+      x-swagger-router-controller: EPG
+  /Epg/nextShow:
+    get:
+      operationId: Epg::nextShow_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpgShow'
+          description: Object with all available information for the next on-air show.
+        424:
+          description: Returned when the EPG module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the next show which is gonna be aired.
+      tags:
+      - EPG
+      x-swagger-router-controller: EPG
+  /Epg/weeklyEpg:
+    get:
+      operationId: Epg::weeklyEpg_get
+      parameters:
+      - description: Startdate of the EPG, in format
+        example: 2018-11-20
+        explode: true
+        in: query
+        name: startdate
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Whether or not the first day will return full or start at the current show (only applys when startdate is today)
+        explode: true
+        in: query
+        name: firstfull
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: The amount of days to return, minimum amount is 1 and maximum amount is 7, defaults to 7
+        explode: true
+        in: query
+        name: days
+        required: false
+        schema:
+          format: int32
+          maximum: 7
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpgWeekly'
+          description: Returns the EPG based on the request parameters
+        403:
+          description: You donn't have rights to access this endpoints
+        424:
+          description: Returned when the EPG module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the full Program Guide.
+      tags:
+      - EPG
+      x-swagger-router-controller: EPG
+  /News/NewsReader:
+    get:
+      operationId: News::NewsReader_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsNewsReader'
+          description: Returns the Current NewsReader onair
+        403:
+          description: You donn't have rights to access this endpoints
+        424:
+          description: Returned when the CurrentNewsReader cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the current NewsReader.
+      tags:
+      - News
+      x-swagger-router-controller: News
+  /News/Weather:
+    get:
+      operationId: News::Weather_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsWeather'
+          description: Returns the last Weather
+        403:
+          description: You donn't have rights to access this endpoints
+        424:
+          description: Returned when the weather cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the last Wheather.
+      tags:
+      - News
+      x-swagger-router-controller: News
+  /Radiomanager/Push:
+    post:
+      operationId: Radiomanager::push_post
+      responses:
+        200:
+          description: Information processed
+        403:
+          description: You donn't have rights to access this endpoints
+        424:
+          description: Returned when the CurrentSong cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] RadioManager pushes it''s changes to this endpoint'
+      tags:
+      - RadioManager
+      x-internal: true
+      x-swagger-router-controller: RadioManager
+  /Replay/Daily:
+    get:
+      operationId: Replay::daily_get
+      parameters:
+      - description: Date to get replay for
+        example: 2018-11-20
+        explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplayDaily'
+          description: Object with all available on demand files for this date.
+        424:
+          description: Returned when the Replay module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get Replay shows and their replay items for a specific day, we deliver replay for only the last 7 days.
+      tags:
+      - Replay
+      x-swagger-router-controller: Replay
+  /Replay/Programm:
+    get:
+      operationId: Replay::programm_get
+      parameters:
+      - description: Programm ID of the show
+        example: "1"
+        explode: true
+        in: query
+        name: programm_id
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReplayProgramm'
+          description: Object with all available information for the next on-air show.
+        424:
+          description: Returned when the EPG module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get all replay items for a programm.
+      tags:
+      - Replay
+      x-swagger-router-controller: Replay
+  /Song/CurrentSong:
+    get:
+      operationId: Song::currentSong_get
+      parameters:
+      - description: Select a other station than the main station, it is selectet bij the short station name!
+        example: 100p_nonstop
+        explode: true
+        in: query
+        name: station
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongCurrent'
+          description: Returns the CurrentSong on the selected station
+        403:
+          description: You donn't have rights to access this endpoints
+        424:
+          description: Returned when the CurrentSong cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the current song on-air.
+      tags:
+      - Song
+      x-swagger-router-controller: Song
+    put:
+      operationId: Song::currentSong_put
+      responses:
+        201:
+          description: Object stored to the Database.
+        424:
+          description: Returned when object not stored to the Database.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] Save the current song to the API.'
+      tags:
+      - Song
+      x-internal: true
+      x-swagger-router-controller: Song
+  /Song/Playlist:
+    get:
+      operationId: Song::Playlist_get
+      parameters:
+      - description: Select a other station than the main station, it is selectet bij the short station name!
+        example: 100p_nonstop
+        explode: true
+        in: query
+        name: station
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Date of the playlist if date not set is the current date.
+        example: 2018-11-20
+        explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The hour you want to pick up, the first hour is 00 and the last 23 leaves this value empty if you want to pick up all day.
+        explode: true
+        in: query
+        name: hour
+        required: false
+        schema:
+          format: numeric
+          maximum: 23
+          minimum: 0
+          type: string
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SongPlaylist'
+          description: Returns the selected Playlist of the selected station
+        424:
+          description: Returned when the Playlist cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the playlist of a station.
+      tags:
+      - Song
+      x-swagger-router-controller: Song
+  /Song/Station:
+    put:
+      operationId: Song::Stations_put
+      responses:
+        201:
+          description: Object stored to the Database.
+        424:
+          description: Returned when object not stored to the Database.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] Save the station to the API.'
+      tags:
+      - Song
+      x-internal: true
+      x-swagger-router-controller: Song
+  /Station/ProgramList:
+    get:
+      operationId: Station::programlist_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationProgramList'
+          description: Object with all available programs on a station.
+        424:
+          description: Returned when the Station module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get a list of all programs which are available for publishing.
+      tags:
+      - Station
+      x-swagger-router-controller: Station
+  /Station/ProgramById:
+    get:
+      operationId: Station::programById_get
+      parameters:
+      - description: Only retrieve a specific program
+        example: "1"
+        explode: true
+        in: query
+        name: program_id
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationProgramById'
+          description: Object with the specific program.
+        424:
+          description: Returned when the Station module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get a specific program, and all the available information for that program
+      tags:
+      - Station
+      x-swagger-router-controller: Station
+  /Station/PresenterList:
+    get:
+      operationId: Station::presenterList_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationPresenterList'
+          description: Array of all active presenters
+        424:
+          description: Returned when the Station module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get a list of all active presenters of the station.
+      tags:
+      - Station
+      x-swagger-router-controller: Station
+  /Station/PresenterById:
+    get:
+      operationId: Station::presenterById_get
+      parameters:
+      - description: Only retrieve a specific presenter
+        example: "1"
+        explode: true
+        in: query
+        name: presenter_id
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationPresenterById'
+          description: Object with the specific program.
+        404:
+          description: Presenter with specified ID not found.
+        424:
+          description: Returned when the Station module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get a specific presenter by its unique id.
+      tags:
+      - Station
+      x-swagger-router-controller: Station
+components:
+  responses:
+    todo:
+      description: This API call has no documentated response (yet)
+    Response200:
+      content:
+        application/json: {}
+      description: Returns a object with the available data
+    TooManyRequests:
+      description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+    Forbidden:
+      description: You donn't have rights to access this endpoints
+  schemas:
+    EpgShow:
+      example:
+        result: true
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/BroadcastItem'
+      type: object
+    EpgWeekly:
+      example:
+        result: true
+        data:
+        - date: 2000-01-23
+          day_epg:
+          - null
+          - null
+          day_count: 6
+        - date: 2000-01-23
+          day_epg:
+          - null
+          - null
+          day_count: 6
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/EpgDay'
+          type: array
+      type: object
+    NewsNewsReader:
+      example:
+        result: true
+        data:
+          added: 2000-01-23T04:56:07.000+00:00
+          reader: Robert-Jan Knook
+          create: 2000-01-23T04:56:07.000+00:00
+          source: ANP
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/NewsReader'
+      type: object
+    NewsWeather:
+      example:
+        result: true
+        data:
+          added: 2000-01-23T04:56:07.000+00:00
+          length: 12 sec
+          create: 2000-01-23T04:56:07.000+00:00
+          writer: Robert-Jan Knook
+          source: ANP
+          message: Het weer.<br /><br />Het is bewolkt met hier en daar motregen. 4 tot 6 graden. Morgen is het droog en behoorlijk fris. 's middags wat zon. De rest van de week meer kans op regen en zachter.
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/Weather'
+      type: object
+    ReplayDaily:
+      example:
+        result: true
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/ReplayBroadcast'
+      type: object
+    ReplayProgramm:
+      example:
+        result: true
+        data:
+        - null
+        - null
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/ReplayBroadcast'
+          type: array
+      type: object
+    SongCurrent:
+      example:
+        result: true
+        data:
+        - station:
+            name: 100% Feest
+            short_name: 100p_feest
+          items:
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+        - station:
+            name: 100% Feest
+            short_name: 100p_feest
+          items:
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/CurrentSong'
+          type: array
+      type: object
+    SongPlaylist:
+      example:
+        result: true
+        data:
+        - station:
+            name: 100% Feest
+            short_name: 100p_feest
+          items:
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          playlistinfo:
+            date: 2000-01-23
+            tracks_played: 15
+            hour: "11"
+            start: 2000-01-23T04:56:07.000+00:00
+            end: 2000-01-23T04:56:07.000+00:00
+        - station:
+            name: 100% Feest
+            short_name: 100p_feest
+          items:
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          - metadata:
+              duration_sec: 185
+            artist: André Hazes Jr.
+            starttime: 2000-01-23T04:56:07.000+00:00
+            title: Wie Kan Mij Vertellen
+          playlistinfo:
+            date: 2000-01-23
+            tracks_played: 15
+            hour: "11"
+            start: 2000-01-23T04:56:07.000+00:00
+            end: 2000-01-23T04:56:07.000+00:00
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/Playlist'
+          type: array
+      type: object
+    StationProgramList:
+      example:
+        result: true
+        data:
+        - null
+        - null
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/ProgramFull'
+          type: array
+      type: object
+    StationProgramById:
+      example:
+        result: true
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/ProgramFull'
+      type: object
+    StationPresenterList:
+      example:
+        result: true
+        data:
+        - presenter_id: 1
+          header:
+            image_default: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+            image_mobile: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          fullname: John Doe
+          info:
+            photo: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+            biography: HTML Formatted content
+        - presenter_id: 1
+          header:
+            image_default: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+            image_mobile: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          fullname: John Doe
+          info:
+            photo: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+            biography: HTML Formatted content
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/Presenter'
+          type: array
+      type: object
+    StationPresenterById:
+      example:
+        result: true
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/PresenterById'
+      type: object
+    BroadcastItem:
+      allOf:
+      - $ref: '#/components/schemas/ProgramCompact'
+      - allOf:
+        - $ref: '#/components/schemas/ProgramFull'
+        - properties:
+            broadcast_id:
+              example: 1201
+              format: int32
+              type: integer
+            start:
+              example: 2016-01-11T22:01:11+02:00
+            stop:
+              example: 2016-01-11T22:01:11+02:00
+          type: object
+    EpgDay:
+      example:
+        date: 2000-01-23
+        day_epg:
+        - null
+        - null
+        day_count: 6
+      properties:
+        date:
+          format: date
+          type: string
+        day_count:
+          example: 6
+          format: int32
+          type: integer
+        day_epg:
+          items:
+            $ref: '#/components/schemas/BroadcastItem'
+          type: array
+      type: object
+    NewsReader:
+      example:
+        added: 2000-01-23T04:56:07.000+00:00
+        reader: Robert-Jan Knook
+        create: 2000-01-23T04:56:07.000+00:00
+        source: ANP
+      properties:
+        reader:
+          example: Robert-Jan Knook
+          type: string
+        source:
+          example: ANP
+          type: string
+        create:
+          description: The date dat the object is create by the source.
+          format: date-time
+          type: string
+        added:
+          description: The date dat the object is added to the API.
+          format: date-time
+          type: string
+      type: object
+    Weather:
+      example:
+        added: 2000-01-23T04:56:07.000+00:00
+        length: 12 sec
+        create: 2000-01-23T04:56:07.000+00:00
+        writer: Robert-Jan Knook
+        source: ANP
+        message: Het weer.<br /><br />Het is bewolkt met hier en daar motregen. 4 tot 6 graden. Morgen is het droog en behoorlijk fris. 's middags wat zon. De rest van de week meer kans op regen en zachter.
+      properties:
+        writer:
+          example: Robert-Jan Knook
+          type: string
+        message:
+          example: Het weer.<br /><br />Het is bewolkt met hier en daar motregen. 4 tot 6 graden. Morgen is het droog en behoorlijk fris. 's middags wat zon. De rest van de week meer kans op regen en zachter.
+          type: string
+        length:
+          example: 12 sec
+          type: string
+        source:
+          example: ANP
+          type: string
+        create:
+          description: The date dat the object is create by the source.
+          format: date-time
+          type: string
+        added:
+          description: The date dat the object is added to the API.
+          format: date-time
+          type: string
+      type: object
+    Presenter:
+      example:
+        presenter_id: 1
+        header:
+          image_default: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+          image_mobile: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+        fullname: John Doe
+        info:
+          photo: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          biography: HTML Formatted content
+      properties:
+        presenter_id:
+          example: 1
+          format: int32
+          type: integer
+        fullname:
+          example: John Doe
+          type: string
+        info:
+          $ref: '#/components/schemas/PresenterInfo'
+        header:
+          $ref: '#/components/schemas/PresenterHeader'
+      type: object
+    PresenterInfo:
+      example:
+        photo: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+        biography: HTML Formatted content
+      properties:
+        photo:
+          example: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          type: string
+        biography:
+          example: HTML Formatted content
+          type: string
+      type: object
+    PresenterHeader:
+      example:
+        image_default: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+        image_mobile: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+      properties:
+        image_mobile:
+          example: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          type: string
+        image_default:
+          example: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+          type: string
+      type: object
+    PresenterById:
+      allOf:
+      - $ref: '#/components/schemas/Presenter'
+      - properties:
+          broadcasts_upcoming:
+            items:
+              $ref: '#/components/schemas/ProgramCompact'
+            type: array
+        type: object
+    ProgramCompact:
+      properties:
+        program_id:
+          example: 1
+          format: int32
+          type: integer
+        title:
+          example: Joost=Wakker!
+          type: string
+        short_name:
+          example: joost
+          type: string
+        type:
+          enum:
+          - live
+          - nonstop
+          - recorded
+          example: live
+          type: string
+      type: object
+    ProgramFull:
+      allOf:
+      - $ref: '#/components/schemas/ProgramCompact'
+      - properties:
+          station:
+            $ref: '#/components/schemas/Station'
+          info:
+            $ref: '#/components/schemas/ProgramInfo'
+          header:
+            $ref: '#/components/schemas/ProgramHeader'
+          presenters:
+            items:
+              $ref: '#/components/schemas/Presenter'
+            type: array
+        type: object
+    ProgramInfo:
+      properties:
+        description:
+          example: HTML Formatted content
+          type: string
+        description_plain:
+          example: Description in plain text (linebreak = \n)
+          type: string
+      type: object
+    ProgramHeader:
+      properties:
+        image_mobile:
+          example: http://www.slam.nl/uploads/2017/11/mixmarathon-mobiel.jpg
+          type: string
+        image_default:
+          example: http://www.slam.nl/uploads/2017/11/mixmarathon-header.jpg
+          type: string
+      type: object
+    ReplayBroadcast:
+      allOf:
+      - $ref: '#/components/schemas/ProgramCompact'
+      - allOf:
+        - $ref: '#/components/schemas/ProgramFull'
+        - properties:
+            replay:
+              items:
+                $ref: '#/components/schemas/ReplayHour'
+              type: array
+            items:
+              items:
+                $ref: '#/components/schemas/ReplayItem'
+              type: array
+          type: object
+    ReplayHour:
+      properties:
+        title:
+          example: Housuh in de Pauzuh van 26-11-2018 12:00
+          type: string
+        start:
+          example: 2018-11-26T12:00:00+01:00
+          type: string
+        file:
+          example: https://audio.slam.nl/2018-11-26_1200.mp3
+          type: string
+      type: object
+    ReplayItem: {}
+    CurrentSong:
+      example:
+        station:
+          name: 100% Feest
+          short_name: 100p_feest
+        items:
+        - metadata:
+            duration_sec: 185
+          artist: André Hazes Jr.
+          starttime: 2000-01-23T04:56:07.000+00:00
+          title: Wie Kan Mij Vertellen
+        - metadata:
+            duration_sec: 185
+          artist: André Hazes Jr.
+          starttime: 2000-01-23T04:56:07.000+00:00
+          title: Wie Kan Mij Vertellen
+      properties:
+        station:
+          $ref: '#/components/schemas/Station'
+        items:
+          items:
+            $ref: '#/components/schemas/Song'
+          type: array
+      type: object
+    Playlist:
+      example:
+        station:
+          name: 100% Feest
+          short_name: 100p_feest
+        items:
+        - metadata:
+            duration_sec: 185
+          artist: André Hazes Jr.
+          starttime: 2000-01-23T04:56:07.000+00:00
+          title: Wie Kan Mij Vertellen
+        - metadata:
+            duration_sec: 185
+          artist: André Hazes Jr.
+          starttime: 2000-01-23T04:56:07.000+00:00
+          title: Wie Kan Mij Vertellen
+        playlistinfo:
+          date: 2000-01-23
+          tracks_played: 15
+          hour: "11"
+          start: 2000-01-23T04:56:07.000+00:00
+          end: 2000-01-23T04:56:07.000+00:00
+      properties:
+        station:
+          $ref: '#/components/schemas/Station'
+        playlistinfo:
+          $ref: '#/components/schemas/PlaylistInfo'
+        items:
+          items:
+            $ref: '#/components/schemas/Song'
+          type: array
+      type: object
+    PlaylistInfo:
+      example:
+        date: 2000-01-23
+        tracks_played: 15
+        hour: "11"
+        start: 2000-01-23T04:56:07.000+00:00
+        end: 2000-01-23T04:56:07.000+00:00
+      properties:
+        date:
+          format: date
+          type: string
+        hour:
+          example: "11"
+          type: string
+        start:
+          format: date-time
+          type: string
+        end:
+          format: date-time
+          type: string
+        tracks_played:
+          example: 15
+          format: int32
+          type: integer
+      type: object
+    Song:
+      example:
+        metadata:
+          duration_sec: 185
+        artist: André Hazes Jr.
+        starttime: 2000-01-23T04:56:07.000+00:00
+        title: Wie Kan Mij Vertellen
+      properties:
+        starttime:
+          format: date-time
+          type: string
+        artist:
+          example: André Hazes Jr.
+          type: string
+        title:
+          example: Wie Kan Mij Vertellen
+          type: string
+        metadata:
+          $ref: '#/components/schemas/SongMetadata'
+      type: object
+    SongMetadata:
+      example:
+        duration_sec: 185
+      properties:
+        duration_sec:
+          example: 185
+          format: int32
+          type: integer
+      type: object
+    Station:
+      example:
+        name: 100% Feest
+        short_name: 100p_feest
+      properties:
+        name:
+          example: 100% Feest
+          type: string
+        short_name:
+          example: 100p_feest
+          type: string
+      type: object
+  securitySchemes:
+    api_key:
+      description: Use your API Key
+      in: header
+      name: X-Api-Key
+      type: apiKey
