@@ -788,9 +788,11 @@ components:
               format: int32
               type: integer
             start:
-              example: 2016-01-11T22:01:11+02:00
+              format: date
+              type: string
             stop:
-              example: 2016-01-11T22:01:11+02:00
+              format: date
+              type: string
           type: object
     EpgDay:
       example:
