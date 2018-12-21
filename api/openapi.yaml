@@ -415,6 +415,37 @@ paths:
       tags:
       - Station
       x-swagger-router-controller: Station
+  /Station/BroadcastById:
+    get:
+      operationId: Station::BroadcastById_get
+      parameters:
+      - description: Only retrieve a specific program
+        example: "1"
+        explode: true
+        in: query
+        name: broadcast_id
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationBroadcastById'
+          description: Object with the specific program.
+        424:
+          description: Returned when the Station module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get a specific broadcast, and all the available information for that broadcast
+      tags:
+      - Station
+      x-swagger-router-controller: Station
   /Station/PresenterList:
     get:
       operationId: Station::presenterList_get
@@ -729,6 +760,20 @@ components:
           type: string
         data:
           $ref: '#/components/schemas/ProgramFull'
+      type: object
+    StationBroadcastById:
+      example:
+        result: true
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          $ref: '#/components/schemas/BroadcastItem'
       type: object
     StationPresenterList:
       example:

@@ -2,6 +2,28 @@
 
 
 /**
+ * Get a specific broadcast, and all the available information for that broadcast
+ *
+ * broadcastUnderscoreid Integer Only retrieve a specific program (optional)
+ * returns StationBroadcastById
+ **/
+exports.stationBroadcastById_get = function(broadcastUnderscoreid) {
+  return new Promise(function(resolve, reject) {
+    var examples = {};
+    examples['application/json'] = {
+  "result" : true,
+  "error" : "An error message"
+};
+    if (Object.keys(examples).length > 0) {
+      resolve(examples[Object.keys(examples)[0]]);
+    } else {
+      resolve();
+    }
+  });
+}
+
+
+/**
  * Get a specific presenter by its unique id.
  *
  * presenterUnderscoreid Integer Only retrieve a specific presenter (optional)

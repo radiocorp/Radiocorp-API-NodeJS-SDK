@@ -3,6 +3,17 @@
 var utils = require('../utils/writer.js');
 var Station = require('../service/StationService');
 
+module.exports.stationBroadcastById_get = function stationBroadcastById_get (req, res, next) {
+  var broadcastUnderscoreid = req.swagger.params['broadcast_id'].value;
+  Station.stationBroadcastById_get(broadcastUnderscoreid)
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};
+
 module.exports.stationPresenterById_get = function stationPresenterById_get (req, res, next) {
   var presenterUnderscoreid = req.swagger.params['presenter_id'].value;
   Station.stationPresenterById_get(presenterUnderscoreid)
