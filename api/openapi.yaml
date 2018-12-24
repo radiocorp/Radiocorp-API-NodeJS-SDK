@@ -31,6 +31,8 @@ tags:
   name: Song
 - description: Group of endpoints to get information about News.
   name: News
+- description: Group of endpoints for messages
+  name: Messages
 - description: Group of endpoints which are used by RadioManager.
   name: RadioManager
 paths:
@@ -125,6 +127,77 @@ paths:
       tags:
       - EPG
       x-swagger-router-controller: EPG
+  /Messages/List:
+    get:
+      operationId: Messages::list_get
+      parameters:
+      - description: The id from or up to which message you want to get, if it's a positive integer you will get messages newer than the provided id, if you provide a negative integer you will get messages older than the id
+        example: -5874
+        explode: true
+        in: query
+        name: last_msg
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: A comma seperated list of message ids you want to receive, in this case, limit will be ommited
+        example: 464613,464608,464606
+        explode: true
+        in: query
+        name: msgs
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: The maximum of messages to return
+        example: "40"
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: Return messages since this datetime
+        example: 2018-12-22T21:54:37+01:00
+        explode: true
+        in: query
+        name: sincedate
+        required: false
+        schema:
+          type: date
+        style: form
+      - description: Return messages up to this datetime
+        example: 2018-12-22T21:54:37+01:00
+        explode: true
+        in: query
+        name: todate
+        required: false
+        schema:
+          type: date
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesList'
+          description: Object with all available messages based on the search criteria.
+        424:
+          description: Returned when the Messages module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] Get the messages for this station based on filters defined
+        down here.'
+      tags:
+      - Messages
+      x-internal: true
+      x-swagger-router-controller: Messages
   /News/NewsReader:
     get:
       operationId: News::NewsReader_get
@@ -553,6 +626,73 @@ components:
             $ref: '#/components/schemas/EpgDay'
           type: array
       type: object
+    MessagesList:
+      example:
+        result: true
+        data:
+        - message_empty: true
+          message_hash: 6c2a0df98972881bdaaba5b2636b29ac
+          attachment:
+            thumb_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg/small
+            full_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg
+            id: 57454
+            type: image
+            hash: 5e719eb0f090d1603cb856165953a3ce
+          parent_id: 465113
+          contact:
+            msisdn_readable: 06 12345678
+            name: John Doe
+            id: 57454
+            msisdn: "31612345678"
+            email: john@example.com
+          message_id: 465114
+          message_type: app
+          to_visual: true
+          received:
+            today: true
+            received_iso: 2000-01-23
+            received_time: 21:54:37
+            timestamp: 1545512077
+          reply_allowed: true
+          message: This is the message body
+        - message_empty: true
+          message_hash: 6c2a0df98972881bdaaba5b2636b29ac
+          attachment:
+            thumb_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg/small
+            full_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg
+            id: 57454
+            type: image
+            hash: 5e719eb0f090d1603cb856165953a3ce
+          parent_id: 465113
+          contact:
+            msisdn_readable: 06 12345678
+            name: John Doe
+            id: 57454
+            msisdn: "31612345678"
+            email: john@example.com
+          message_id: 465114
+          message_type: app
+          to_visual: true
+          received:
+            today: true
+            received_iso: 2000-01-23
+            received_time: 21:54:37
+            timestamp: 1545512077
+          reply_allowed: true
+          message: This is the message body
+        error: An error message
+      properties:
+        result:
+          description: Result of the call, true when ok, false when an error occured
+          type: boolean
+        error:
+          example: An error message
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/Message'
+          type: array
+      type: object
     NewsNewsReader:
       example:
         result: true
@@ -858,6 +998,134 @@ components:
           items:
             $ref: '#/components/schemas/BroadcastItem'
           type: array
+      type: object
+    Message:
+      example:
+        message_empty: true
+        message_hash: 6c2a0df98972881bdaaba5b2636b29ac
+        attachment:
+          thumb_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg/small
+          full_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg
+          id: 57454
+          type: image
+          hash: 5e719eb0f090d1603cb856165953a3ce
+        parent_id: 465113
+        contact:
+          msisdn_readable: 06 12345678
+          name: John Doe
+          id: 57454
+          msisdn: "31612345678"
+          email: john@example.com
+        message_id: 465114
+        message_type: app
+        to_visual: true
+        received:
+          today: true
+          received_iso: 2000-01-23
+          received_time: 21:54:37
+          timestamp: 1545512077
+        reply_allowed: true
+        message: This is the message body
+      properties:
+        message_id:
+          example: 465114
+          format: int32
+          type: integer
+        message_hash:
+          example: 6c2a0df98972881bdaaba5b2636b29ac
+          type: string
+        message_type:
+          example: app
+          type: string
+        parent_id:
+          example: 465113
+          format: int32
+          type: integer
+        reply_allowed:
+          type: boolean
+        to_visual:
+          type: boolean
+        contact:
+          $ref: '#/components/schemas/MessageContact'
+        message:
+          example: This is the message body
+          type: string
+        message_empty:
+          type: boolean
+        attachment:
+          $ref: '#/components/schemas/MessageAttachment'
+        received:
+          $ref: '#/components/schemas/MessageReceived'
+      type: object
+    MessageContact:
+      example:
+        msisdn_readable: 06 12345678
+        name: John Doe
+        id: 57454
+        msisdn: "31612345678"
+        email: john@example.com
+      properties:
+        id:
+          example: 57454
+          format: int32
+          type: integer
+        name:
+          example: John Doe
+          type: string
+        email:
+          example: john@example.com
+          type: string
+        msisdn:
+          example: "31612345678"
+          type: string
+        msisdn_readable:
+          example: 06 12345678
+          type: string
+      type: object
+    MessageAttachment:
+      example:
+        thumb_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg/small
+        full_url: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg
+        id: 57454
+        type: image
+        hash: 5e719eb0f090d1603cb856165953a3ce
+      properties:
+        id:
+          example: 57454
+          format: int32
+          type: integer
+        hash:
+          example: 5e719eb0f090d1603cb856165953a3ce
+          type: string
+        type:
+          example: image
+          type: string
+        full_url:
+          example: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg
+          type: string
+        thumb_url:
+          example: https://studio.radiocorp.nl/attachment/1545512077_87be30d2dce230a6f6ac7087452fd26b.jpg/small
+          type: string
+      type: object
+    MessageReceived:
+      example:
+        today: true
+        received_iso: 2000-01-23
+        received_time: 21:54:37
+        timestamp: 1545512077
+      properties:
+        timestamp:
+          example: 1545512077
+          format: int32
+          type: integer
+        received_time:
+          example: 21:54:37
+          type: string
+        received_iso:
+          format: date
+          type: string
+        today:
+          type: boolean
       type: object
     NewsReader:
       example:
