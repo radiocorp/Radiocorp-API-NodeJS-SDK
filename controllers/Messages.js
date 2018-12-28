@@ -29,3 +29,14 @@ module.exports.messagesList_get = function messagesList_get (req, res, next) {
       utils.writeJson(res, response);
     });
 };
+
+module.exports.messagesReply_post = function messagesReply_post (req, res, next) {
+  var messageReply = req.swagger.params['MessageReply'].value;
+  Messages.messagesReply_post(messageReply)
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};

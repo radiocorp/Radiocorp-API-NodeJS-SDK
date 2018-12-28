@@ -238,6 +238,29 @@ paths:
       - Messages
       x-internal: true
       x-swagger-router-controller: Messages
+  /Messages/Reply:
+    post:
+      operationId: Messages::reply_post
+      requestBody:
+        $ref: '#/components/requestBodies/MessageReply'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesList'
+          description: Object with all available messages based on the search criteria.
+        424:
+          description: Returned when the Messages module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] Reply to a message'
+      tags:
+      - Messages
+      x-internal: true
+      x-swagger-router-controller: Messages
   /News/NewsReader:
     get:
       operationId: News::NewsReader_get
@@ -613,6 +636,14 @@ paths:
       - Station
       x-swagger-router-controller: Station
 components:
+  requestBodies:
+    MessageReply:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MessageReply'
+      description: Pet object that needs to be added to the store
+      required: true
   responses:
     todo:
       description: This API call has no documentated response (yet)
@@ -1166,6 +1197,27 @@ components:
           type: string
         today:
           type: boolean
+      type: object
+    MessageReply:
+      example:
+        receiver: "31651224756"
+        parent_id: 45678
+        type: sms
+        message: The reply message
+      properties:
+        parent_id:
+          example: 45678
+          format: int32
+          type: integer
+        type:
+          example: sms
+          type: string
+        receiver:
+          example: "31651224756"
+          type: string
+        message:
+          example: The reply message
+          type: string
       type: object
     NewsReader:
       example:
