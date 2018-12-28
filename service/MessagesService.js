@@ -171,7 +171,7 @@ exports.messagesList_get = function(lastUnderscoremsg,msgs,limit,sincedate,todat
 /**
  * [INTERNAL] Reply to a message
  *
- * messageReply MessageReply Pet object that needs to be added to the store
+ * messageReply MessageReply The message to be sent
  * returns MessagesList
  **/
 exports.messagesReply_post = function(messageReply) {

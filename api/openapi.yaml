@@ -642,7 +642,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/MessageReply'
-      description: Pet object that needs to be added to the store
+      description: The message to be sent
       required: true
   responses:
     todo:
@@ -1206,16 +1206,20 @@ components:
         message: The reply message
       properties:
         parent_id:
+          description: ID of the message you are reply-ing to
           example: 45678
           format: int32
           type: integer
         type:
+          description: Type of message you reply to (currently only sms is supported)
           example: sms
           type: string
         receiver:
+          description: MSISDN of the receiver in international format
           example: "31651224756"
           type: string
         message:
+          description: The message body
           example: The reply message
           type: string
       type: object
