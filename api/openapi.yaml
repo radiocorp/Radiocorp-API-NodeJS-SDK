@@ -198,6 +198,46 @@ paths:
       - Messages
       x-internal: true
       x-swagger-router-controller: Messages
+  /Messages/Conversation:
+    get:
+      operationId: Messages::conversation_get
+      parameters:
+      - description: The hash where you want the conversation for
+        example: ead1b12e47ec7cc5390303831b779d47
+        explode: true
+        in: query
+        name: hash
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: The page you want to retreive
+        example: ead1b12e47ec7cc5390303831b779d47
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagesList'
+          description: Object with all available messages based on the search criteria.
+        424:
+          description: Returned when the Messages module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: '[INTERNAL] Get the conversation based on a message hash'
+      tags:
+      - Messages
+      x-internal: true
+      x-swagger-router-controller: Messages
   /News/NewsReader:
     get:
       operationId: News::NewsReader_get
