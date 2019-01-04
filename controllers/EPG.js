@@ -13,6 +13,16 @@ module.exports.epgCurrentShow_get = function epgCurrentShow_get (req, res, next)
     });
 };
 
+module.exports.epgNextHour_get = function epgNextHour_get (req, res, next) {
+  EPG.epgNextHour_get()
+    .then(function (response) {
+      utils.writeJson(res, response);
+    })
+    .catch(function (response) {
+      utils.writeJson(res, response);
+    });
+};
+
 module.exports.epgNextShow_get = function epgNextShow_get (req, res, next) {
   EPG.epgNextShow_get()
     .then(function (response) {

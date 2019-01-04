@@ -23,6 +23,27 @@ exports.epgCurrentShow_get = function() {
 
 
 /**
+ * Get the show which aires the next hour.
+ *
+ * returns EpgShow
+ **/
+exports.epgNextHour_get = function() {
+  return new Promise(function(resolve, reject) {
+    var examples = {};
+    examples['application/json'] = {
+  "result" : true,
+  "error" : "An error message"
+};
+    if (Object.keys(examples).length > 0) {
+      resolve(examples[Object.keys(examples)[0]]);
+    } else {
+      resolve();
+    }
+  });
+}
+
+
+/**
  * Get the next show which is gonna be aired.
  *
  * returns EpgShow

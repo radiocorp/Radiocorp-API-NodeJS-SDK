@@ -76,6 +76,26 @@ paths:
       tags:
       - EPG
       x-swagger-router-controller: EPG
+  /Epg/nextHour:
+    get:
+      operationId: Epg::nextHour_get
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EpgShow'
+          description: Object with all available information for the next on-air show.
+        424:
+          description: Returned when the EPG module cannot be loaded.
+        429:
+          description: Too many requests, you have reached the time and max call limits for your API Key, you can check the headers X-RateLimit-Remaining for remaining available calls and the header X-RateLimit-Reset for the moment when the counter gets reset.
+      security:
+      - api_key: []
+      summary: Get the show which aires the next hour.
+      tags:
+      - EPG
+      x-swagger-router-controller: EPG
   /Epg/weeklyEpg:
     get:
       operationId: Epg::weeklyEpg_get
