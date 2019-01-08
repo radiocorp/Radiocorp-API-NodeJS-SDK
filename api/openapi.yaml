@@ -15,11 +15,11 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: 'Public RadioCorp API '
+  title: Public RadioCorp API [Development]
   version: v0.0
 servers:
 - description: Production server
-  url: https://api.radiocorp.io
+  url: https://api.dev.radiocorp.io
 tags:
 - description: Group of endpoints to get EPG information for the station.
   name: EPG
