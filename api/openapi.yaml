@@ -306,6 +306,16 @@ paths:
   /News/Weather:
     get:
       operationId: News::Weather_get
+      parameters:
+      - description: From which provider do you want to load the bulletin, possible values are 'anp' or 'weeronline'
+        example: anp
+        explode: true
+        in: query
+        name: provider
+        required: false
+        schema:
+          type: string
+        style: form
       responses:
         200:
           content:

@@ -31,9 +31,10 @@ exports.newsNewsReader_get = function() {
 /**
  * Get the last Wheather.
  *
+ * provider String From which provider do you want to load the bulletin, possible values are 'anp' or 'weeronline' (optional)
  * returns NewsWeather
  **/
-exports.newsWeather_get = function() {
+exports.newsWeather_get = function(provider) {
   return new Promise(function(resolve, reject) {
     var examples = {};
     examples['application/json'] = {

@@ -14,7 +14,8 @@ module.exports.newsNewsReader_get = function newsNewsReader_get (req, res, next)
 };
 
 module.exports.newsWeather_get = function newsWeather_get (req, res, next) {
-  News.newsWeather_get()
+  var provider = req.swagger.params['provider'].value;
+  News.newsWeather_get(provider)
     .then(function (response) {
       utils.writeJson(res, response);
     })
